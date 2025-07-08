@@ -1,8 +1,14 @@
 name = "navigation-site"
 compatibility_date = "2023-12-01"
 
-[env.production]
 # D1数据库绑定
+[[d1_databases]]
+binding = "DB"
+database_name = "navigation-db"
+database_id = "bd874799-c6cc-4c98-a1c4-1bb1921e17f6"
+
+[env.production]
+# 生产环境D1数据库绑定
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "navigation-db"
@@ -15,7 +21,4 @@ binding = "DB"
 database_name = "navigation-db"
 database_id = "bd874799-c6cc-4c98-a1c4-1bb1921e17f6"
 
-# 构建配置
-[build]
-command = "npm run build"
-publish = "out" 
+ 
