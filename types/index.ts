@@ -1,0 +1,233 @@
+// 图标类型
+export type IconType = "lucide" | "favicon" | "custom"
+
+// 主题类型
+export type Theme = "light" | "dark"
+
+// 页面模式
+export type PageMode = "user" | "admin"
+
+// 网站接口
+export interface Website {
+  id: number
+  name: string
+  url: string
+  category: string
+  description: string
+  icon_type: IconType
+  icon_value: string
+  clicks: number
+  is_recommended: boolean
+  created_at: string
+  updated_at: string
+}
+
+// 分类接口
+export interface Category {
+  id: number
+  name: string
+  created_at: string
+  updated_at: string
+}
+
+// 主题样式类型
+export interface ThemeClasses {
+  background: string
+  text: string
+  secondaryText: string
+  card: string
+  cardBorder: string
+  cardHover: string
+  button: string
+  buttonHover: string
+  input: string
+  inputFocus: string
+  badge: string
+  badgeText: string
+  accent: string
+  muted: string
+  overlay: string
+  adminBackground: string
+  adminCard: string
+  adminButton: string
+  adminButtonHover: string
+  adminText: string
+  adminSecondaryText: string
+  searchBackground: string
+  searchBorder: string
+  searchText: string
+  categoryButton: string
+  categoryButtonHover: string
+  categoryButtonActive: string
+  categoryButtonText: string
+  recommendedCard: string
+  recommendedCardBorder: string
+  recommendedBadge: string
+  recommendedBadgeText: string
+  websiteCard: string
+  websiteCardBorder: string
+  websiteCardHover: string
+  iconColor: string
+  iconBg: string  // 原版特有
+  deleteButton: string
+  deleteButtonHover: string
+  editButton: string
+  editButtonHover: string
+  saveButton: string
+  saveButtonHover: string
+  cancelButton: string
+  cancelButtonHover: string
+  addButton: string
+  addButtonHover: string
+  themeButton: string
+  themeButtonHover: string
+  loginButton: string
+  loginButtonHover: string
+  logoutButton: string
+  logoutButtonHover: string
+  clearButton: string
+  clearButtonHover: string
+  refreshButton: string
+  refreshButtonHover: string
+  toggleButton: string
+  toggleButtonHover: string
+  dialogBackground: string
+  dialogBorder: string
+  dialogText: string
+  dialogSecondaryText: string
+  tabsBackground: string
+  tabsText: string
+  tabsActiveText: string
+  tabsActiveBorder: string
+  radioBackground: string
+  radioText: string
+  radioChecked: string
+  checkboxBackground: string
+  checkboxText: string
+  checkboxChecked: string
+  selectBackground: string
+  selectText: string
+  selectBorder: string
+  textareaBackground: string
+  textareaText: string
+  textareaBorder: string
+  labelText: string
+  errorText: string
+  successText: string
+  warningText: string
+  infoText: string
+  linkText: string
+  linkHover: string
+  separatorColor: string
+  scrollbarTrack: string
+  scrollbarThumb: string
+  scrollbarThumbHover: string
+  loadingSpinner: string
+  loadingText: string
+  emptyStateText: string
+  placeholderText: string
+  tooltipBackground: string
+  tooltipText: string
+  tooltipBorder: string
+  modalOverlay: string
+  modalBackground: string
+  modalBorder: string
+  modalText: string
+  modalSecondaryText: string
+  progressBackground: string
+  progressFill: string
+  avatarBackground: string
+  avatarText: string
+  avatarBorder: string
+  codeBackground: string
+  codeText: string
+  codeBorder: string
+  preBackground: string
+  preText: string
+  preBorder: string
+  blockquoteBackground: string
+  blockquoteText: string
+  blockquoteBorder: string
+  tableBackground: string
+  tableText: string
+  tableBorder: string
+  tableHeaderBackground: string
+  tableHeaderText: string
+  tableRowHover: string
+  tableRowText: string
+  navBackground: string
+  navText: string
+  navBorder: string
+  navLinkText: string
+  navLinkHover: string
+  navLinkActive: string
+  sidebarBackground: string
+  sidebarText: string
+  sidebarBorder: string
+  sidebarLinkText: string
+  sidebarLinkHover: string
+  sidebarLinkActive: string
+  headerBackground: string
+  headerText: string
+  headerBorder: string
+  footerBackground: string
+  footerText: string
+  footerBorder: string
+  breadcrumbText: string
+  breadcrumbSeparator: string
+  breadcrumbActive: string
+  paginationBackground: string
+  paginationText: string
+  paginationBorder: string
+  paginationHover: string
+  paginationActive: string
+  paginationDisabled: string
+  dropdownBackground: string
+  dropdownText: string
+  dropdownBorder: string
+  dropdownItemHover: string
+  dropdownItemActive: string
+  contextMenuBackground: string
+  contextMenuText: string
+  contextMenuBorder: string
+  contextMenuItemHover: string
+  contextMenuItemActive: string
+  toastBackground: string
+  toastText: string
+  toastBorder: string
+  toastSuccessBackground: string
+  toastSuccessText: string
+  toastSuccessBorder: string
+  toastErrorBackground: string
+  toastErrorText: string
+  toastErrorBorder: string
+  toastWarningBackground: string
+  toastWarningText: string
+  toastWarningBorder: string
+  toastInfoBackground: string
+  toastInfoText: string
+  toastInfoBorder: string
+  calendarBackground: string
+  calendarText: string
+  calendarBorder: string
+  calendarHeaderBackground: string
+  calendarHeaderText: string
+  calendarDayHover: string
+  calendarDaySelected: string
+  calendarDayToday: string
+  calendarDayDisabled: string
+  chartBackground: string
+  chartText: string
+  chartBorder: string
+  chartLine: string
+  chartFill: string
+  chartGrid: string
+  chartTooltipBackground: string
+  chartTooltipText: string
+  chartTooltipBorder: string
+  // 原版特有样式
+  textMuted?: string  // 某些地方使用
+  textPlaceholder: string
+  glass: string
+  glassHover: string
+} 

@@ -1,0 +1,51 @@
+---
+alwaysApply: true
+description: Navigation site project structure and architecture guide
+---
+
+# 导航站项目结构指南
+
+## 项目概述
+
+这是一个基于 Next.js 14 的导航站点项目，支持网站管理、分类管理、用户认证等功能。
+
+## 技术栈
+
+- **前端框架**: Next.js 14 (App Router)
+- **语言**: TypeScript
+- **样式**: Tailwind CSS + shadcn/ui 组件库
+- **数据库**: SQLite
+- **状态管理**: React Hooks (useState, useEffect, useCallback)
+
+## 核心文件结构
+
+- **主页面**: [app/page.tsx](mdc:app/page.tsx) - 主要的导航站界面
+- **API路由**: [app/api/](mdc:app/api/) - 后端API端点
+- **组件库**: [components/](mdc:components/) - 可复用组件
+- **自定义Hooks**: [hooks/](mdc:hooks/) - 业务逻辑封装
+- **类型定义**: [types/index.ts](mdc:types/index.ts) - 全局TypeScript类型
+- **工具函数**: [lib/](mdc:lib/) - 数据库连接和工具函数
+
+## 数据库架构
+
+- **users**: 用户认证表
+- **categories**: 网站分类表  
+- **websites**: 网站信息表（包含推荐状态、点击统计等）
+- 数据库文件: [lib/database.ts](mdc:lib/database.ts)
+- 初始化脚本: [scripts/init-database.sql](mdc:scripts/init-database.sql)
+
+## 核心功能模块
+
+1. **网站管理**: 添加、编辑、删除网站
+2. **分类管理**: 创建和管理网站分类
+3. **推荐系统**: 网站推荐状态管理
+4. **主题切换**: 深色/浅色主题支持
+5. **图标缓存**: 自动缓存网站图标提升性能
+6. **管理后台**: 管理员权限和批量操作
+
+## 重要约定
+
+- 所有数据操作都通过API路由进行
+- 使用细粒度状态更新避免整页刷新
+- 图标支持 Lucide图标、Favicon、自定义上传三种模式
+- SQLite中布尔值使用 0/1 而非 true/false
