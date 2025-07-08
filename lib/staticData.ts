@@ -123,5 +123,5 @@ export class StaticDataAdapter {
   }
 }
 
-// 检测是否为静态导出环境
-export const isStaticExport = process.env.NODE_ENV === 'production' && typeof window !== 'undefined'; 
+// 强制使用静态模式（Cloudflare Pages部署）
+export const isStaticExport = true; 
