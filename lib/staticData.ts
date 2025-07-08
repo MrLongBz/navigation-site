@@ -123,5 +123,5 @@ export class StaticDataAdapter {
   }
 }
 
-// 强制使用静态模式（Cloudflare Pages部署）
-export const isStaticExport = true; 
+// 在开发分支中禁用静态模式，使用API
+export const isStaticExport = false; 
