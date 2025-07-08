@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { D1DatabaseManager, type Env } from '@/lib/d1-database'
 
-export const runtime = 'edge'
+// export const runtime = 'edge' // 临时禁用edge runtime以支持静态导出
 
 export async function POST(request: NextRequest) {
   try {
