@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/database'
+import { D1DatabaseManager, type Env } from '@/lib/d1-database'
+
+export const runtime = 'edge'
 
 export async function GET() {
   try {
-    const websites = db.prepare('SELECT * FROM websites ORDER BY created_at DESC').all()
+    const env = process.env as unknown as Env
+    const dbManager = new D1DatabaseManager(env.DB)
+    
+    const websites = await dbManager.getAllWebsites()
     return NextResponse.json(websites)
   } catch (error) {
     console.error('获取网站列表失败:', error)
@@ -34,12 +39,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const result = db.prepare(`
-      INSERT INTO websites (name, url, category, description, icon_type, icon_value, is_recommended)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(name, url, category, description, iconType, iconValue, isRecommended ? 1 : 0)
-
-    const newWebsite = db.prepare('SELECT * FROM websites WHERE id = ?').get(result.lastInsertRowid)
+    const env = process.env as unknown as Env
+    const dbManager = new D1DatabaseManager(env.DB)
+    
+    const newWebsite = await dbManager.createWebsite({
+      name, url, category, description, iconType, iconValue, isRecommended
+    })
 
     return NextResponse.json(newWebsite)
   } catch (error) {

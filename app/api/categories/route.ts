@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/database'
+import { D1DatabaseManager, type Env } from '@/lib/d1-database'
+
+export const runtime = 'edge'
 
 export async function GET() {
   try {
-    const categories = db.prepare('SELECT * FROM categories ORDER BY created_at ASC').all()
+    const env = process.env as unknown as Env
+    const dbManager = new D1DatabaseManager(env.DB)
+    
+    const categories = await dbManager.getAllCategories()
     return NextResponse.json(categories)
   } catch (error) {
     console.error('获取分类列表失败:', error)
@@ -25,8 +30,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const result = db.prepare('INSERT INTO categories (name) VALUES (?)').run(name.trim())
-    const newCategory = db.prepare('SELECT * FROM categories WHERE id = ?').get(result.lastInsertRowid)
+    const env = process.env as unknown as Env
+    const dbManager = new D1DatabaseManager(env.DB)
+    
+    const newCategory = await dbManager.createCategory(name.trim())
 
     return NextResponse.json(newCategory)
   } catch (error: any) {

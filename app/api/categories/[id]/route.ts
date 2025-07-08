@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/database'
+import { D1DatabaseManager, type Env } from '@/lib/d1-database'
+
+export const runtime = 'edge'
 
 export async function PUT(
   request: NextRequest,
@@ -16,8 +18,10 @@ export async function PUT(
       )
     }
 
-    db.prepare('UPDATE categories SET name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(name.trim(), id)
-    const updatedCategory = db.prepare('SELECT * FROM categories WHERE id = ?').get(id)
+    const env = process.env as unknown as Env
+    const dbManager = new D1DatabaseManager(env.DB)
+    
+    const updatedCategory = await dbManager.updateCategory(id, name.trim())
 
     return NextResponse.json(updatedCategory)
   } catch (error: any) {
@@ -42,9 +46,12 @@ export async function DELETE(
   try {
     const id = parseInt(params.id)
     
-    db.prepare('DELETE FROM categories WHERE id = ?').run(id)
+    const env = process.env as unknown as Env
+    const dbManager = new D1DatabaseManager(env.DB)
+    
+    const success = await dbManager.deleteCategory(id)
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success })
   } catch (error) {
     console.error('删除分类失败:', error)
     return NextResponse.json(

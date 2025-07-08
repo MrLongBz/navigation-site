@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/database'
+import { D1DatabaseManager, type Env } from '@/lib/d1-database'
+
+export const runtime = 'edge'
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,8 +14,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // 获取D1数据库实例
+    const env = process.env as unknown as Env
+    const dbManager = new D1DatabaseManager(env.DB)
+
     // 查找用户
-    const user = db.prepare('SELECT * FROM users WHERE username = ? AND password = ?').get(username, password)
+    const user = await dbManager.getUser(username, password)
 
     if (!user) {
       return NextResponse.json(
@@ -23,11 +29,10 @@ export async function POST(request: NextRequest) {
     }
 
     // 返回用户信息（不包含密码）
-    const { password: _, ...userInfo } = user as any
     const userData = {
-      id: userInfo.id,
-      username: userInfo.username,
-      isAdmin: Boolean(userInfo.is_admin)
+      id: user.id,
+      username: user.username,
+      isAdmin: Boolean(user.is_admin)
     }
 
     return NextResponse.json({

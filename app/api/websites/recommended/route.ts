@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/database'
+import { D1DatabaseManager, type Env } from '@/lib/d1-database'
+
+export const runtime = 'edge'
 
 export async function GET() {
   try {
-    const recommendedWebsites = db.prepare('SELECT * FROM websites WHERE is_recommended = 1 ORDER BY created_at DESC').all()
+    const env = process.env as unknown as Env
+    const dbManager = new D1DatabaseManager(env.DB)
+    
+    const recommendedWebsites = await dbManager.getRecommendedWebsites()
     return NextResponse.json(recommendedWebsites)
   } catch (error) {
     console.error('获取推荐网站失败:', error)
