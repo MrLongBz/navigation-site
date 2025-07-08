@@ -21,4 +21,7 @@ binding = "DB"
 database_name = "navigation-db"
 database_id = "bd874799-c6cc-4c98-a1c4-1bb1921e17f6"
 
+# Cloudflare Pages 配置
+pages_build_output_dir = "out"
+
  
