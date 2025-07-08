@@ -6,14 +6,14 @@ compatibility_date = "2023-12-01"
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "navigation-db"
-database_id = "your-d1-database-id"
+database_id = "bd874799-c6cc-4c98-a1c4-1bb1921e17f6"
 
 [env.preview]
 # 预览环境D1数据库绑定
 [[env.preview.d1_databases]]
 binding = "DB"
-database_name = "navigation-db-preview"
-database_id = "your-preview-d1-database-id"
+database_name = "navigation-db"
+database_id = "bd874799-c6cc-4c98-a1c4-1bb1921e17f6"
 
 # 构建配置
 [build]
