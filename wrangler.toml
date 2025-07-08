@@ -9,7 +9,7 @@ pages_build_output_dir = ".vercel/output/static"
 [[d1_databases]]
 binding = "DB"
 database_name = "navigation-db"
-database_id = "4baa5877-14a1-4aa7-b4c0-9df6bceeaa23"
+database_id = "bd874799-c6cc-4c98-a1c4-1bb1921e17f6"
 migrations_dir = "scripts"
 
 [env.production]
