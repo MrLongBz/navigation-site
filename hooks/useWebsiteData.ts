@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react"
 import type { Website, Category } from "@/types"
+import { StaticDataAdapter, isStaticExport } from "@/lib/staticData"
 
 export function useWebsiteData() {
   const [websites, setWebsites] = useState<Website[]>([])
@@ -8,29 +9,43 @@ export function useWebsiteData() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // 加载所有数据
+  // 加载所有数据 - 支持静态和动态环境
   const loadData = useCallback(async () => {
     setLoading(true)
     setError(null)
     
     try {
-      const [websitesRes, categoriesRes, recommendedRes] = await Promise.all([
-        fetch("/api/websites"),
-        fetch("/api/categories"),
-        fetch("/api/websites/recommended")
-      ])
+      if (isStaticExport) {
+        // 静态环境：使用预定义数据
+        console.log("使用静态数据加载")
+        const websitesData = await StaticDataAdapter.getWebsites()
+        const categoriesData = await StaticDataAdapter.getCategories()
+        const recommendedData = await StaticDataAdapter.getRecommendedWebsites()
 
-      if (!websitesRes.ok || !categoriesRes.ok || !recommendedRes.ok) {
-        throw new Error("加载数据失败")
+        setWebsites(websitesData)
+        setCategories(categoriesData)
+        setRecommendedWebsites(recommendedData)
+      } else {
+        // 动态环境：使用API
+        console.log("使用API数据加载")
+        const [websitesRes, categoriesRes, recommendedRes] = await Promise.all([
+          fetch("/api/websites"),
+          fetch("/api/categories"),
+          fetch("/api/websites/recommended")
+        ])
+
+        if (!websitesRes.ok || !categoriesRes.ok || !recommendedRes.ok) {
+          throw new Error("加载数据失败")
+        }
+
+        const websitesData = await websitesRes.json()
+        const categoriesData = await categoriesRes.json()
+        const recommendedData = await recommendedRes.json()
+
+        setWebsites(websitesData)
+        setCategories(categoriesData)
+        setRecommendedWebsites(recommendedData)
       }
-
-      const websitesData = await websitesRes.json()
-      const categoriesData = await categoriesRes.json()
-      const recommendedData = await recommendedRes.json()
-
-      setWebsites(websitesData)
-      setCategories(categoriesData)
-      setRecommendedWebsites(recommendedData)
     } catch (err) {
       setError(err instanceof Error ? err.message : "加载数据失败")
       console.error("加载数据失败:", err)
