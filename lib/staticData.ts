@@ -123,5 +123,5 @@ export class StaticDataAdapter {
   }
 }
 
-// 在开发分支中禁用静态模式，使用API
+// Cloudflare D1版本：禁用静态模式，使用D1数据库API
 export const isStaticExport = false; 
