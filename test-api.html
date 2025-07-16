@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 8px 16px; margin: 5px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        input { padding: 5px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>API 测试工具</h1>
+    
+    <div class="test-section">
+        <h2>1. 测试基础 API</h2>
+        <button onclick="testGetWebsites()">GET /api/websites</button>
+        <button onclick="testGetCategories()">GET /api/categories</button>
+        <button onclick="testGetRecommended()">GET /api/websites/recommended</button>
+        <div id="basic-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. 测试推荐功能</h2>
+        <input type="number" id="websiteId" placeholder="网站ID" value="1">
+        <button onclick="testPatchRecommend()">PATCH 切换推荐</button>
+        <button onclick="testPutUpdate()">PUT 更新网站</button>
+        <div id="patch-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. 测试网络连接</h2>
+        <button onclick="testNetworkStatus()">检查网络状态</button>
+        <div id="network-result"></div>
+    </div>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            const timestamp = new Date().toLocaleTimeString();
+            element.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+        }
+
+        function clearLog(elementId) {
+            document.getElementById(elementId).innerHTML = '';
+        }
+
+        async function testGetWebsites() {
+            clearLog('basic-result');
+            try {
+                log('basic-result', '正在测试 GET /api/websites...', 'info');
+                const response = await fetch('/api/websites');
+                log('basic-result', `响应状态: ${response.status} ${response.statusText}`, 'info');
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                log('basic-result', `成功获取 ${data.length} 个网站`, 'success');
+                log('basic-result', `<pre>${JSON.stringify(data.slice(0, 2), null, 2)}</pre>`, 'success');
+            } catch (error) {
+                log('basic-result', `失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetCategories() {
+            try {
+                log('basic-result', '正在测试 GET /api/categories...', 'info');
+                const response = await fetch('/api/categories');
+                log('basic-result', `响应状态: ${response.status} ${response.statusText}`, 'info');
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                log('basic-result', `成功获取 ${data.length} 个分类`, 'success');
+            } catch (error) {
+                log('basic-result', `失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetRecommended() {
+            try {
+                log('basic-result', '正在测试 GET /api/websites/recommended...', 'info');
+                const response = await fetch('/api/websites/recommended');
+                log('basic-result', `响应状态: ${response.status} ${response.statusText}`, 'info');
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                log('basic-result', `成功获取 ${data.length} 个推荐网站`, 'success');
+            } catch (error) {
+                log('basic-result', `失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function testPatchRecommend() {
+            clearLog('patch-result');
+            const websiteId = document.getElementById('websiteId').value;
+            if (!websiteId) {
+                log('patch-result', '请输入网站ID', 'error');
+                return;
+            }
+
+            try {
+                log('patch-result', `正在测试 PATCH /api/websites/${websiteId}...`, 'info');
+                
+                const response = await fetch(`/api/websites/${websiteId}`, {
+                    method: 'PATCH',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'toggle-recommend' })
+                });
+
+                log('patch-result', `响应状态: ${response.status} ${response.statusText}`, 'info');
+                log('patch-result', `响应头: ${JSON.stringify([...response.headers.entries()])}`, 'info');
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    log('patch-result', `响应内容: ${errorText}`, 'error');
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const data = await response.json();
+                log('patch-result', '成功切换推荐状态!', 'success');
+                log('patch-result', `<pre>${JSON.stringify(data, null, 2)}</pre>`, 'success');
+            } catch (error) {
+                log('patch-result', `失败: ${error.message}`, 'error');
+                log('patch-result', `错误详情: ${error.stack}`, 'error');
+            }
+        }
+
+        async function testPutUpdate() {
+            const websiteId = document.getElementById('websiteId').value;
+            if (!websiteId) {
+                log('patch-result', '请输入网站ID', 'error');
+                return;
+            }
+
+            try {
+                log('patch-result', `正在测试 PUT /api/websites/${websiteId}...`, 'info');
+                
+                const response = await fetch(`/api/websites/${websiteId}`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ description: '测试更新 ' + new Date().toLocaleTimeString() })
+                });
+
+                log('patch-result', `响应状态: ${response.status} ${response.statusText}`, 'info');
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const data = await response.json();
+                log('patch-result', 'PUT 请求成功!', 'success');
+                log('patch-result', `<pre>${JSON.stringify(data, null, 2)}</pre>`, 'success');
+            } catch (error) {
+                log('patch-result', `PUT 失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function testNetworkStatus() {
+            clearLog('network-result');
+            try {
+                log('network-result', '检查网络连接状态...', 'info');
+                log('network-result', `当前域名: ${window.location.origin}`, 'info');
+                log('network-result', `用户代理: ${navigator.userAgent}`, 'info');
+                log('network-result', `在线状态: ${navigator.onLine ? '在线' : '离线'}`, 'info');
+                
+                // 测试基本连通性
+                const startTime = Date.now();
+                const response = await fetch('/api/websites', { method: 'HEAD' });
+                const endTime = Date.now();
+                
+                log('network-result', `API 响应时间: ${endTime - startTime}ms`, 'success');
+                log('network-result', `API 可访问性: ${response.ok ? '正常' : '异常'}`, response.ok ? 'success' : 'error');
+            } catch (error) {
+                log('network-result', `网络检查失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 页面加载时自动运行基础测试
+        window.onload = function() {
+            testNetworkStatus();
+            setTimeout(testGetWebsites, 1000);
+        };
+    </script>
+</body>
+</html>

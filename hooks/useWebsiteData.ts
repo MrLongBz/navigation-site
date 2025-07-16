@@ -159,22 +159,51 @@ export function useWebsiteData() {
   // 切换推荐状态
   const toggleRecommended = useCallback(async (website: Website) => {
     try {
-      const response = await fetch(`/api/websites/${website.id}`, {
+      console.log("=== toggleRecommended 开始 ===")
+      console.log("网站信息:", { id: website.id, name: website.name, current: website.is_recommended })
+      
+      // 先尝试 PATCH 方法
+      let response = await fetch(`/api/websites/${website.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "toggle-recommend" })
       })
 
+      console.log("PATCH 响应状态:", response.status, response.statusText)
+
+      // 如果 PATCH 失败，尝试使用 PUT 方法作为备选方案
       if (!response.ok) {
-        throw new Error("切换推荐状态失败")
+        console.log("PATCH 失败，尝试 PUT 方法...")
+        const newRecommendedStatus = !website.is_recommended
+        
+        response = await fetch(`/api/websites/${website.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            ...website,
+            is_recommended: newRecommendedStatus 
+          })
+        })
+        
+        console.log("PUT 响应状态:", response.status, response.statusText)
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error("API 错误响应:", errorText)
+        throw new Error(`切换推荐状态失败: ${response.status} ${errorText}`)
       }
 
       const updatedWebsite = await response.json()
+      console.log("API 返回的更新数据:", updatedWebsite)
+      
       updateWebsiteInState(updatedWebsite)
+      console.log("=== toggleRecommended 成功 ===")
       
       return updatedWebsite
     } catch (error) {
-      console.error("切换推荐状态失败:", error)
+      console.error("=== toggleRecommended 失败 ===")
+      console.error("错误详情:", error)
       throw error
     }
   }, [updateWebsiteInState])
