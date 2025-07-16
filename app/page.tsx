@@ -812,91 +812,272 @@ export default function HomePage() {
                 </TabsList>
 
                 <TabsContent value="websites" className="space-y-4">
-                  {/* 批量操作 */}
-                  {selectedWebsites.length > 0 && (
+                  {/* 统计信息 */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className={`${themeClasses.card} p-4 rounded-lg`}>
-                      <div className="flex items-center justify-between">
-                        <span className={themeClasses.text}>已选择 {selectedWebsites.length} 个网站</span>
-                        <Button
-                          onClick={() => deleteMultipleWebsites(selectedWebsites)}
-                          variant="destructive"
-                          size="sm"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          批量删除
-                        </Button>
+                      <div className="flex items-center space-x-2">
+                        <Globe className={`h-5 w-5 ${themeClasses.accent}`} />
+                        <div>
+                          <div className={`${themeClasses.text} text-lg font-semibold`}>{websites.length}</div>
+                          <div className={`${themeClasses.muted} text-sm`}>总网站数</div>
+                        </div>
                       </div>
                     </div>
-                  )}
+                    <div className={`${themeClasses.card} p-4 rounded-lg`}>
+                      <div className="flex items-center space-x-2">
+                        <Star className={`h-5 w-5 ${theme === "dark" ? "text-amber-400" : "text-rose-400"}`} />
+                        <div>
+                          <div className={`${themeClasses.text} text-lg font-semibold`}>{recommendedWebsites.length}</div>
+                          <div className={`${themeClasses.muted} text-sm`}>推荐网站</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={`${themeClasses.card} p-4 rounded-lg`}>
+                      <div className="flex items-center space-x-2">
+                        <FolderPlus className={`h-5 w-5 ${themeClasses.accent}`} />
+                        <div>
+                          <div className={`${themeClasses.text} text-lg font-semibold`}>{categories.length}</div>
+                          <div className={`${themeClasses.muted} text-sm`}>分类数量</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={`${themeClasses.card} p-4 rounded-lg`}>
+                      <div className="flex items-center space-x-2">
+                        <Users className={`h-5 w-5 ${themeClasses.accent}`} />
+                        <div>
+                          <div className={`${themeClasses.text} text-lg font-semibold`}>
+                            {websites.reduce((sum, w) => sum + w.clicks, 0)}
+                          </div>
+                          <div className={`${themeClasses.muted} text-sm`}>总点击数</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-                  {/* 网站列表 */}
-                  <div className="grid gap-4">
-                    {websites.map((website) => (
-                      <Card key={website.id} className={`${themeClasses.card}`}>
-                        <CardContent className="p-4">
-                          <div className="flex items-center space-x-4">
-                            <Checkbox
-                              checked={selectedWebsites.includes(website.id)}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setSelectedWebsites((prev) => [...prev, website.id])
-                                } else {
-                                  setSelectedWebsites((prev) => prev.filter((id) => id !== website.id))
+                  {/* 搜索和筛选工具栏 */}
+                  <div className={`${themeClasses.card} p-4 rounded-lg space-y-4`}>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="flex-1">
+                        <div className="relative">
+                          <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${themeClasses.muted} h-4 w-4`} />
+                          <Input
+                            placeholder="搜索网站名称或描述..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className={`pl-10 ${themeClasses.input}`}
+                          />
+                        </div>
+                      </div>
+                      <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                        <SelectTrigger className={`w-full sm:w-48 ${themeClasses.selectBackground}`}>
+                          <SelectValue placeholder="选择分类" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="全部">全部分类</SelectItem>
+                          {categories.map((category) => (
+                            <SelectItem key={category.id} value={category.name}>
+                              {category.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    {/* 批量操作 */}
+                    {selectedWebsites.length > 0 && (
+                      <div className="flex items-center justify-between pt-2 border-t border-opacity-20">
+                        <span className={themeClasses.text}>已选择 {selectedWebsites.length} 个网站</span>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => {
+                              // 批量设为推荐
+                              selectedWebsites.forEach(id => {
+                                const website = websites.find(w => w.id === id)
+                                if (website && !website.is_recommended) {
+                                  handleToggleRecommended(website)
                                 }
-                              }}
-                            />
-                            <div className={`p-2 rounded-lg ${themeClasses.iconBg}`}>
-                              <WebsiteIcon
-                                website={website}
-                                size="h-6 w-6"
-                                theme={theme}
+                              })
+                            }}
+                            variant="outline"
+                            size="sm"
+                            className={themeClasses.button}
+                          >
+                            <Star className="h-4 w-4 mr-2" />
+                            批量推荐
+                          </Button>
+                          <Button
+                            onClick={() => deleteMultipleWebsites(selectedWebsites)}
+                            variant="destructive"
+                            size="sm"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            批量删除
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 网站表格 */}
+                  <div className={`${themeClasses.card} rounded-lg overflow-hidden`}>
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className={`${themeClasses.tableHeaderBackground} border-b`}>
+                          <tr>
+                            <th className="w-12 p-3 text-left">
+                              <Checkbox
+                                checked={selectedWebsites.length === websites.length && websites.length > 0}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setSelectedWebsites(websites.map(w => w.id))
+                                  } else {
+                                    setSelectedWebsites([])
+                                  }
+                                }}
                               />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center space-x-2">
-                                <h3 className={`${themeClasses.text} font-medium`}>{website.name}</h3>
-                                {Boolean(website.is_recommended) && (
-                                  <Star
-                                    className={`h-4 w-4 ${theme === "dark" ? "text-amber-400" : "text-rose-400"} fill-current`}
-                                  />
-                                )}
-                              </div>
-                              <p className={`${themeClasses.muted} text-sm`}>{website.description}</p>
-                              <div className="flex items-center space-x-4 mt-1">
-                                <span className={`${themeClasses.muted} text-xs`}>分类: {website.category}</span>
-                                <span className={`${themeClasses.muted} text-xs`}>点击: {website.clicks}</span>
+                            </th>
+                            <th className={`${themeClasses.tableHeaderText} p-3 text-left font-medium`}>网站</th>
+                            <th className={`${themeClasses.tableHeaderText} p-3 text-left font-medium`}>分类</th>
+                            <th className={`${themeClasses.tableHeaderText} p-3 text-left font-medium`}>URL</th>
+                            <th className={`${themeClasses.tableHeaderText} p-3 text-center font-medium`}>点击数</th>
+                            <th className={`${themeClasses.tableHeaderText} p-3 text-center font-medium`}>推荐</th>
+                            <th className={`${themeClasses.tableHeaderText} p-3 text-center font-medium`}>操作</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredWebsites.map((website, index) => (
+                            <tr 
+                              key={website.id} 
+                              className={`${themeClasses.tableRowHover} border-b border-opacity-10 ${
+                                index % 2 === 0 ? 'bg-opacity-5' : ''
+                              }`}
+                            >
+                              <td className="p-3">
+                                <Checkbox
+                                  checked={selectedWebsites.includes(website.id)}
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      setSelectedWebsites((prev) => [...prev, website.id])
+                                    } else {
+                                      setSelectedWebsites((prev) => prev.filter((id) => id !== website.id))
+                                    }
+                                  }}
+                                />
+                              </td>
+                              <td className="p-3">
+                                <div className="flex items-center space-x-3">
+                                  <div className={`p-1.5 rounded ${themeClasses.iconBg}`}>
+                                    <WebsiteIcon
+                                      website={website}
+                                      size="h-5 w-5"
+                                      theme={theme}
+                                    />
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <div className={`${themeClasses.tableRowText} font-medium truncate`}>
+                                      {website.name}
+                                    </div>
+                                    <div className={`${themeClasses.muted} text-sm truncate max-w-xs`}>
+                                      {website.description}
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="p-3">
+                                <Badge variant="outline" className={`${themeClasses.badge} text-xs`}>
+                                  {website.category}
+                                </Badge>
+                              </td>
+                              <td className="p-3">
                                 <a
                                   href={website.url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className={`${themeClasses.muted} text-xs hover:underline`}
+                                  className={`${themeClasses.linkText} text-sm hover:underline truncate block max-w-xs`}
+                                  title={website.url}
                                 >
                                   {website.url}
                                 </a>
-                              </div>
-                            </div>
-                            <div className="flex space-x-2">
-                              <Button
-                                onClick={() => handleToggleRecommended(website)}
-                                variant="outline"
-                                size="sm"
-                                className={`${themeClasses.button} ${website.is_recommended ? "text-amber-500" : ""}`}
-                                title={website.is_recommended ? "取消推荐" : "设为推荐"}
-                              >
+                              </td>
+                              <td className="p-3 text-center">
+                                <span className={`${themeClasses.tableRowText} text-sm`}>
+                                  {website.clicks}
+                                </span>
+                              </td>
+                              <td className="p-3 text-center">
                                 {website.is_recommended ? (
-                                  <Heart className="h-4 w-4 fill-current" />
+                                  <Star className={`h-4 w-4 mx-auto ${theme === "dark" ? "text-amber-400" : "text-rose-400"} fill-current`} />
                                 ) : (
-                                  <HeartOff className="h-4 w-4" />
+                                  <span className={`${themeClasses.muted} text-sm`}>-</span>
                                 )}
-                              </Button>
-                              <Button variant="destructive" size="sm" onClick={() => handleWebsiteDelete(website.id)}>
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
+                              </td>
+                              <td className="p-3">
+                                <div className="flex items-center justify-center space-x-1">
+                                  <Button
+                                    onClick={() => handleToggleRecommended(website)}
+                                    variant="ghost"
+                                    size="sm"
+                                    className={`h-8 w-8 p-0 ${website.is_recommended ? "text-amber-500" : themeClasses.button}`}
+                                    title={website.is_recommended ? "取消推荐" : "设为推荐"}
+                                  >
+                                    {website.is_recommended ? (
+                                      <Heart className="h-4 w-4" />
+                                    ) : (
+                                      <HeartOff className="h-4 w-4" />
+                                    )}
+                                  </Button>
+                                  <Button
+                                    onClick={() => startEditing(website)}
+                                    variant="ghost"
+                                    size="sm"
+                                    className={`h-8 w-8 p-0 ${themeClasses.button}`}
+                                    title="编辑网站"
+                                  >
+                                    <Edit3 className="h-4 w-4" />
+                                  </Button>
+                                  <Button 
+                                    onClick={() => handleWebsiteDelete(website.id)}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                    title="删除网站"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      
+                      {filteredWebsites.length === 0 && (
+                        <div className="text-center py-12">
+                          <div className={`${themeClasses.muted} text-lg`}>
+                            {searchTerm || selectedCategory !== "全部" ? "未找到匹配的网站" : "暂无网站数据"}
                           </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          <p className={`${themeClasses.muted} text-sm mt-2`}>
+                            {searchTerm || selectedCategory !== "全部" ? "尝试调整搜索条件" : "点击上方按钮添加第一个网站"}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* 表格底部信息 */}
+                    {filteredWebsites.length > 0 && (
+                      <div className={`${themeClasses.card} p-3 mt-4 rounded-lg`}>
+                        <div className="flex items-center justify-between text-sm">
+                          <div className={themeClasses.muted}>
+                            显示 {filteredWebsites.length} 个网站，共 {websites.length} 个
+                          </div>
+                          <div className={`${themeClasses.muted} flex items-center space-x-4`}>
+                            <span>推荐: {filteredWebsites.filter(w => w.is_recommended).length}</span>
+                            <span>总点击: {filteredWebsites.reduce((sum, w) => sum + w.clicks, 0)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    </div>
                   </div>
                 </TabsContent>
 
