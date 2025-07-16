@@ -56,27 +56,41 @@ export function useWebsiteData() {
 
   // 更新网站状态
   const updateWebsiteInState = useCallback((updatedWebsite: Website) => {
+    console.log("=== updateWebsiteInState 调试 ===")
     console.log("更新本地状态:", {
       id: updatedWebsite.id,
       name: updatedWebsite.name,
+      is_recommended: updatedWebsite.is_recommended,
+      is_recommended_type: typeof updatedWebsite.is_recommended,
       icon_type: updatedWebsite.icon_type,
       icon_value: updatedWebsite.icon_value?.substring(0, 50) + "...",
       hasIconValue: !!updatedWebsite.icon_value
     })
     
-    setWebsites(prev => prev.map(w => w.id === updatedWebsite.id ? updatedWebsite : w))
+    setWebsites(prev => {
+      const updated = prev.map(w => w.id === updatedWebsite.id ? updatedWebsite : w)
+      console.log("网站列表已更新，找到匹配项:", prev.some(w => w.id === updatedWebsite.id))
+      return updated
+    })
     
     // 同时更新推荐列表
+    console.log("处理推荐列表更新，is_recommended:", updatedWebsite.is_recommended)
     if (updatedWebsite.is_recommended) {
       setRecommendedWebsites(prev => {
         const existing = prev.find(w => w.id === updatedWebsite.id)
+        console.log("添加到推荐列表，已存在:", !!existing)
         return existing 
           ? prev.map(w => w.id === updatedWebsite.id ? updatedWebsite : w)
           : [...prev, updatedWebsite]
       })
     } else {
-      setRecommendedWebsites(prev => prev.filter(w => w.id !== updatedWebsite.id))
+      setRecommendedWebsites(prev => {
+        const filtered = prev.filter(w => w.id !== updatedWebsite.id)
+        console.log("从推荐列表移除，原长度:", prev.length, "新长度:", filtered.length)
+        return filtered
+      })
     }
+    console.log("=== updateWebsiteInState 调试结束 ===")
   }, [])
 
   // 添加网站到状态

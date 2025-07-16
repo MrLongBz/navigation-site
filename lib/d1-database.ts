@@ -81,12 +81,20 @@ export class D1DatabaseManager {
   // 网站相关操作
   async getAllWebsites() {
     const result = await this.db.prepare('SELECT * FROM websites ORDER BY created_at DESC').all();
-    return result.results;
+    // 确保布尔值正确转换
+    return result.results.map(website => ({
+      ...website,
+      is_recommended: Boolean(website.is_recommended)
+    }));
   }
 
   async getRecommendedWebsites() {
     const result = await this.db.prepare('SELECT * FROM websites WHERE is_recommended = 1 ORDER BY created_at DESC').all();
-    return result.results;
+    // 确保布尔值正确转换
+    return result.results.map(website => ({
+      ...website,
+      is_recommended: Boolean(website.is_recommended)
+    }));
   }
 
   async createWebsite(data: any) {
@@ -98,8 +106,13 @@ export class D1DatabaseManager {
     `).bind(name, url, category, description, iconType, iconValue, isRecommended ? 1 : 0).run();
 
     if (result.success) {
-      return await this.db.prepare('SELECT * FROM websites WHERE id = ?')
+      const website = await this.db.prepare('SELECT * FROM websites WHERE id = ?')
         .bind(result.meta.last_row_id).first();
+      // 确保布尔值正确转换
+      return {
+        ...website,
+        is_recommended: Boolean(website.is_recommended)
+      };
     }
     throw new Error('创建网站失败');
   }
@@ -129,7 +142,12 @@ export class D1DatabaseManager {
     const result = await this.db.prepare(sql).bind(...values).run();
 
     if (result.success) {
-      return await this.db.prepare('SELECT * FROM websites WHERE id = ?').bind(id).first();
+      const website = await this.db.prepare('SELECT * FROM websites WHERE id = ?').bind(id).first();
+      // 确保布尔值正确转换
+      return {
+        ...website,
+        is_recommended: Boolean(website.is_recommended)
+      };
     }
     throw new Error('更新网站失败');
   }
@@ -137,6 +155,61 @@ export class D1DatabaseManager {
   async deleteWebsite(id: number) {
     const result = await this.db.prepare('DELETE FROM websites WHERE id = ?').bind(id).run();
     return result.success;
+  }
+
+  // 切换推荐状态
+  async toggleRecommendedStatus(id: number) {
+    // 先获取当前状态
+    const current = await this.db.prepare('SELECT is_recommended FROM websites WHERE id = ?').bind(id).first();
+    if (!current) {
+      throw new Error('网站不存在');
+    }
+
+    // 切换状态
+    const newStatus = current.is_recommended ? 0 : 1;
+    const result = await this.db.prepare(`
+      UPDATE websites SET is_recommended = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+    `).bind(newStatus, id).run();
+
+    if (result.success) {
+      const website = await this.db.prepare('SELECT * FROM websites WHERE id = ?').bind(id).first();
+      // 确保布尔值正确转换
+      return {
+        ...website,
+        is_recommended: Boolean(website.is_recommended)
+      };
+    }
+    throw new Error('切换推荐状态失败');
+  }
+
+  // 增加点击数
+  async incrementClicks(id: number) {
+    const result = await this.db.prepare(`
+      UPDATE websites SET clicks = clicks + 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+    `).bind(id).run();
+
+    if (result.success) {
+      const website = await this.db.prepare('SELECT * FROM websites WHERE id = ?').bind(id).first();
+      // 确保布尔值正确转换
+      return {
+        ...website,
+        is_recommended: Boolean(website.is_recommended)
+      };
+    }
+    throw new Error('更新点击数失败');
+  }
+
+  // 获取单个网站信息
+  async getWebsiteById(id: number) {
+    const website = await this.db.prepare('SELECT * FROM websites WHERE id = ?').bind(id).first();
+    if (website) {
+      // 确保布尔值正确转换
+      return {
+        ...website,
+        is_recommended: Boolean(website.is_recommended)
+      };
+    }
+    return null;
   }
 
   // 分类相关操作

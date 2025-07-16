@@ -180,9 +180,20 @@ export default function HomePage() {
 
   const handleToggleRecommended = async (website: Website) => {
     try {
-      await toggleRecommended(website)
+      console.log("开始切换推荐状态:", { id: website.id, name: website.name, current: website.is_recommended })
+      const result = await toggleRecommended(website)
+      console.log("推荐状态切换成功:", result)
+      toast({
+        title: "操作成功",
+        description: `${website.name} ${result.is_recommended ? '已设为推荐' : '已取消推荐'}`,
+      })
     } catch (error) {
       console.error("切换推荐状态失败:", error)
+      toast({
+        variant: "destructive",
+        title: "操作失败",
+        description: `切换推荐状态失败：${error instanceof Error ? error.message : '未知错误'}`,
+      })
     }
   }
 
